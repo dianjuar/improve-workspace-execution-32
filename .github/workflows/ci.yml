@@ -1,0 +1,48 @@
+name: PR's
+on:
+  - push
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code to get access to our custom actions
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Install Dependencies
+        uses: ./.github/actions/setup
+
+      - name: Lint
+        run: npx nx lint node-lib
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code to get access to our custom actions
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Install Dependencies
+        uses: ./.github/actions/setup
+
+      - name: Build
+        run: npx nx build node-lib
+
+  unit-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12, 14, 16]
+    steps:
+      - name: Get code to get access to our custom actions
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Install Dependencies
+        uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Unit Test - with node V${{ matrix.node-version }}
+        run: npx nx test node-lib
